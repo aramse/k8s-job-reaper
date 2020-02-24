@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: example-job-
+spec:
+  template:
+    spec:
+      containers:
+      - name: example
+        image: centos
+        command: ["echo", "foo"]
+      restartPolicy: Never
+  backoffLimit: 0

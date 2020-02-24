@@ -1,0 +1,23 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: job-reaper
+  namespace: kube-system
+spec:
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: job-reaper
+            image: IMAGE_URL%%
+            imagePullPolicy: Always
+#            env:  # override default values
+#            - name: NS_BLACKLIST
+#              value: "kube-system default"
+#            - name: EXPIRATION
+#              value: "1 day"
+          restartPolicy: Never
+          serviceAccountName: job-reaper
+
