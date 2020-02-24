@@ -10,6 +10,6 @@ spec:
       containers:
       - name: example
         image: centos
-        command: ["sleep", "90"]
+        command: ["sleep", "30"]
       restartPolicy: Never
   backoffLimit: 0
