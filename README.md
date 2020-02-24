@@ -1,5 +1,5 @@
 # k8s-job-reaper
-A simple garbage collector to clean up old Job resources in Kubernetes
+A simple controller to clean up old Job resources in Kubernetes
 
 ## Motivation
 As it currently stands in `alpha`, the [TTL feature gate](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#clean-up-finished-jobs-automatically), which offers the ability to automatically clean up Job resources in Kubernetes based on a configured TTL, is weakly supported in managed Kubernetes offerings. For example, it's [not supported](https://github.com/aws/containers-roadmap/issues/255) at all in EKS. As a result, Job resources can quickly pile up and waste cluster resources.
