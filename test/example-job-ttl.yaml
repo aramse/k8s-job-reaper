@@ -1,7 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  generateName: example-job-
+  generateName: example-job-ttl-
+  annotations:
+    ttl: "30 minutes"
 spec:
   template:
     spec:

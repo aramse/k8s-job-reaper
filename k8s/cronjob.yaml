@@ -13,11 +13,11 @@ spec:
           - name: job-reaper
             image: IMAGE_URL%%
             imagePullPolicy: Always
-#            env:  # override default values
+            env:  # override default values
+            - name: DEFAULT_TTL
+              value: "1 day"
 #            - name: NS_BLACKLIST
 #              value: "kube-system default"
-#            - name: EXPIRATION
-#              value: "1 day"
           restartPolicy: Never
           serviceAccountName: job-reaper
 
