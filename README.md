@@ -16,7 +16,7 @@ kind: Job
 metadata:
   generateName: example-job-ttl-
   annotations:
-    ttl: "30 minutes"
+    ttl: "2 hours"
 spec:
   template:
     spec:
