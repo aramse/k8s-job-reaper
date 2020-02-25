@@ -47,5 +47,5 @@ This tool also supports the following configurations.
 | ------------- |---------| -------|-----
 | `DEFAULT_TTL`  | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |  An optional global default TTL for all Jobs | `""`
 | `NS_BLACKLIST` | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |   A list of Kubernetes Namespaces (**space-delimited**) to ignore when looking for Jobs | `"kube-system"`
-| `schedule` | Field in [cronjob.yaml](k8s/cronjob.yaml) | The cron schedule at which to look for Jobs to delete | `"0 */1 0 0 0"` (once an hour)
+| `schedule` | Field in [cronjob.yaml](k8s/cronjob.yaml) | The cron schedule at which to look for Jobs to delete | `"0 */1 * * *"` (once an hour)
 
