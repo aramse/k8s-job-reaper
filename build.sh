@@ -6,7 +6,8 @@ set -e
 
 IMAGE_URL=$1
 
-docker build -t $IMAGE_URL . && docker push $IMAGE_URL
+docker build -t $IMAGE_URL .
+docker push $IMAGE_URL
 
 kubectl apply -f k8s/rbac.yaml
 
