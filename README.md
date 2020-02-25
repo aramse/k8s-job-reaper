@@ -32,6 +32,10 @@ The `ttl` annotation can be specified with any value supported by [GNU relative 
 > Note that this example Job is deployed with `kubectl create` rather than `kubectl apply` due to its usage of `generateName`.
 
 ## Deployment
+### Prerequisites
+- docker
+- kubectl
+
 Deploying this tool is as simple as running:
 ```sh
 ./build.sh [IMAGE_URL]
