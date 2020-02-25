@@ -33,8 +33,8 @@ The `ttl` annotation can be specified with any value supported by [GNU relative 
 
 ## Deployment
 ### Prerequisites
-- docker
-- kubectl
+- `docker`
+- `kubectl`
 
 Deploying this tool is as simple as running:
 ```sh
