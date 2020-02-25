@@ -1,10 +1,10 @@
 # k8s-job-reaper
-A simple controller to clean up old Job resources in Kubernetes
+A simple tool to clean up old Job resources in Kubernetes
 
 ## Motivation
 As it currently stands in `alpha`, the [TTL feature gate](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#clean-up-finished-jobs-automatically), which offers the ability to automatically clean up Job resources in Kubernetes based on a configured TTL, is weakly supported in managed Kubernetes offerings. For example, it's [not supported](https://github.com/aws/containers-roadmap/issues/255) at all in EKS. As a result, Job resources can quickly pile up and waste cluster resources.
 
-This tool aims to deliver the same functionality via a controller that looks for an annotation on Job resources called `ttl`.
+This tool aims to deliver the same functionality via a script that looks for an annotation on Job resources called `ttl`.
 
 > Note that setting `restartPolicy: OnFailure` is another possible solution for cleanup, but it deletes the underlying pod (including its logs) immediately after Job completion, as documented [here](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/#pod-backoff-failure-policy). Therefore it is not considered a viable approach for many use cases.
 
@@ -42,5 +42,10 @@ where `[IMAGE_URL]` is the full URL of the container image you want to build/pus
 ```
 
 ## Configuration
-
+This tool also supports the following configurations.
+| Field        | Location    | Description  | Default 
+| ------------- |---------| -------|-----
+| `DEFAULT_TTL`  | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |  An optional global default TTL for all Jobs | `""`
+| `NS_BLACKLIST` | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |   A list of Kubernetes Namespaces (**space-delimited**) to ignore when looking for Jobs | `"kube-system"`
+| `schedule` | Field in [cronjob.yaml](k8s/cronjob.yaml) | The cron schedule at which to look for Jobs to delete | `"0 */1 0 0 0"` (once an hour)
 
