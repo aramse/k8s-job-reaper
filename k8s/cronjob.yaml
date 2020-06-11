@@ -16,6 +16,8 @@ spec:
 #            env:  # override default values
 #            - name: DEFAULT_TTL
 #              value: "1 day"
+#            - name: DEFAULT_TTL_FAILED
+#              value: "7 days"
 #            - name: NS_BLACKLIST
 #              value: "kube-system default"
           restartPolicy: Never

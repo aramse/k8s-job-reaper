@@ -49,7 +49,8 @@ where `[IMAGE_URL]` is the full URL of the container image you want to build/pus
 This tool also supports the following configurations.
 | Field        | Location    | Description  | Default 
 | ------------- |---------| -------|-----
-| `DEFAULT_TTL`  | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |  An optional global default TTL for all Jobs | `""`
+| `DEFAULT_TTL`  | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |  An optional global default TTL for completed Jobs | `""`
+| `DEFAULT_TTL_FAILED` | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) | An optional global default TTL for uncompleted/failed Jobs (`DEFAULT_TTL` *must* also be set for this to take effect) | `""`
 | `NS_BLACKLIST` | Environment variable in [cronjob.yaml](k8s/cronjob.yaml) |   A list of Kubernetes Namespaces (**space-delimited**) to ignore when looking for Jobs | `"kube-system"`
 | `schedule` | Field in [cronjob.yaml](k8s/cronjob.yaml) | The cron schedule at which to look for Jobs to delete | `"0 */1 * * *"` (once an hour)
 
