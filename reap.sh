@@ -19,7 +19,7 @@ echo "  NS_BLACKLIST: ${NS_BLACKLIST[@]}"
 
 # get Jobs that do not have any parent resources (e.g. ignore those managed by CronJobs)
 IFS=$'\n'
-for j in $(kubectl get jobs --all-namespaces -o json | jq -r ".items[] | [.metadata.name,.metadata.namespace,.metadata.creationTimestamp,.status.completionTime,.metadata.annotations.ttl,.status.active,.status.succeeded] | @csv" |  sed 's/"//g'); do
+for j in $(kubectl get jobs --all-namespaces -o json | jq -r ".items[] | select( .metadata | has(\"ownerReferences\") | not) | [.metadata.name,.metadata.namespace,.metadata.creationTimestamp,.status.completionTime,.metadata.annotations.ttl,.status.active,.status.succeeded] | @csv" |  sed 's/"//g'); do
   job=$(echo $j | cut -d ',' -f 1)
   ns=$(echo $j | cut -d ',' -f 2)
   begin=$(echo $j | cut -d ',' -f 3)
