@@ -19,12 +19,18 @@ echo "  NS_BLACKLIST: ${NS_BLACKLIST[@]}"
 
 # get Jobs that do not have any parent resources (e.g. ignore those managed by CronJobs)
 IFS=$'\n'
-for j in $(kubectl get jobs --all-namespaces -o json | jq -r ".items[] | select( .metadata | has(\"ownerReferences\") | not) | [.metadata.name,.metadata.namespace,.metadata.creationTimestamp,.status.completionTime,.metadata.annotations.ttl] | @csv" | sed 's/"//g'); do
+for j in $(kubectl get jobs --all-namespaces -o json | jq -r ".items[] | select( .metadata | has(\"ownerReferences\") | not) | [.metadata.name,.metadata.namespace,.metadata.creationTimestamp,.status.completionTime,.metadata.annotations.ttl,.status.active,.status.succeeded] | @csv" |  sed 's/"//g'); do
   job=$(echo $j | cut -d ',' -f 1)
   ns=$(echo $j | cut -d ',' -f 2)
   begin=$(echo $j | cut -d ',' -f 3)
   fin=$(echo $j | cut -d ',' -f 4)
   ttl=$(echo $j | cut -d ',' -f 5)
+  active=$(echo $j | cut -d ',' -f 6)
+  succeeded=$(echo $j | cut -d ',' -f 7)
+
+  active=${active:-0}
+  succeeded=${succeeded:-0}
+
   delete=0
   blacklisted=0
   #echo "$job: $fin"
@@ -32,21 +38,29 @@ for j in $(kubectl get jobs --all-namespaces -o json | jq -r ".items[] | select(
     [ "$n" == "$ns" ] && blacklisted=1
   done
   if [ $blacklisted -eq 0 ]; then
-    if [ "$ttl" != "" ]; then  # check if TTL annotation on Job
-      exp_date=$(get_exp_date $ttl)
-      [[ "$fin" < "$exp_date" ]] && echo "job $ns/$job expired (at $exp_date) due to TTL annotation, deleting" && delete=1
-    elif [ "$DEFAULT_TTL" != "" ]; then  # otherwise check if global TTL set
-      if [ "$fin" == "" ]; then
-        [ "$DEFAULT_TTL_FAILED" == "" ] && continue  # skip if not finished and no global TTL set for unfinished jobs
-        exp_date=$(get_exp_date $DEFAULT_TTL_FAILED)
-        [[ "$begin" < "$exp_date" ]] && echo "job $ns/$job expired (at $exp_date) due to global TTL of $DEFAULT_TTL_FAILED for failed jobs, deleting" && delete=1
-      else
-        exp_date=$(get_exp_date $DEFAULT_TTL)
-        [[ "$fin" < "$exp_date" ]] && echo "job $ns/$job expired (at $exp_date) due to global TTL of $DEFAULT_TTL for completed jobs, deleting" && delete=1
+      if [ "$ttl" != "" ] ; then  # check if TTL annotation on Job
+        if [ $active -eq 0 ] ; then
+            if [ $succeeded -eq 1 ]; then
+              exp_date=$(get_exp_date $ttl)
+              [[ "$fin" < "$exp_date" ]] && echo "Finished job $ns/$job expired (at $exp_date) due to TTL($ttl) annotation, deleting" && delete=1
+            else
+              exp_date=$(get_exp_date $DEFAULT_TTL_FAILED)
+              [[ "$begin" < "$exp_date" ]] && echo "Unfinished job $ns/$job expired (at $exp_date) due to default failed TTL ($DEFAULT_TTL_FAILED), deleting" && delete=1
+            fi
+        fi
+      elif [ "$DEFAULT_TTL" != "" ]; then  # otherwise check if global TTL set
+        if [ $active -eq 0 ] ; then
+            if [ $succeeded -eq 1 ]; then
+              exp_date=$(get_exp_date $DEFAULT_TTL)
+              [[ "$fin" < "$exp_date" ]] && echo "Finished job $ns/$job expired (at $exp_date) due to global TTL($DEFAULT_TTL), deleting" && delete=1
+            else
+              exp_date=$(get_exp_date $DEFAULT_TTL_FAILED)
+              [[ "$begin" < "$exp_date" ]] && echo "Unfinished job $ns/$job expired (at $exp_date) due to default failed TTL($DEFAULT_TTL_FAILED), deleting" && delete=1
+            fi
+        fi
       fi
-    fi
+      [ $delete -eq 1 ] && kubectl delete job -n $ns $job
   fi
-  [ $delete -eq 1 ] && kubectl delete job -n $ns $job
 done
 
 echo "reaper finished"
